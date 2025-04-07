@@ -2,21 +2,28 @@
 
 ESP32_CLI CLI;  // Create global instance
 
+
+// constructor cli
+// default interface is serial
 ESP32_CLI::ESP32_CLI() {
   _interface = OutputInterface::serial;
   _inputBuffer = "";
 }
+
+
 
 void ESP32_CLI::begin(unsigned long baudRate) {
   Serial.begin(baudRate);
   while (!Serial) {
     ; // Wait for Serial to be ready
   }
-  
-  // Add built-in commands
+  /**
+   * Add it in cli_comand.cpp
+   */
+  /*
   addCommand("help", "List all available commands", [this](const std::vector<String>& args) {
     this->listCommands();
-  });
+  }); 
   
   addCommand("interface", "Switch or show interface (serial/telnet/both)", [this](const std::vector<String>& args) {
     if (args.size() > 1) {
@@ -44,43 +51,31 @@ void ESP32_CLI::begin(unsigned long baudRate) {
       }
     }
   });
+  */
 }
 
-void ESP32_CLI::setInterface(OutputInterface interface) {
-  _interface = interface;
+// void ESP32_CLI::setInterface(OutputInterface interface) {
+//   _interface = interface;
   
-  String msg = "Switched to ";
-  switch (_interface) {
-    case OutputInterface::serial:
-      msg += "SERIAL";
-      break;
-    case OutputInterface::telnet:
-      msg += "TELNET";
-      break;
-    case OutputInterface::BOTH:
-      msg += "BOTH";
-      break;
-  }
-  println(msg);
-}
+// //   String msg = "Switched to ";
+// //   switch (_interface) {
+// //     case OutputInterface::serial:
+// //       msg += "SERIAL";
+// //       break;
+// //     case OutputInterface::telnet:
+// //       msg += "TELNET";
+// //       break;
+// //     case OutputInterface::BOTH:
+// //       msg += "BOTH";
+// //       break;
+// //   }
+// //   println(msg);
+// }
 
-void ESP32_CLI::switchInterface() {
-  switch (_interface) {
-    case OutputInterface::serial:
-      setInterface(OutputInterface::telnet);
-      break;
-    case OutputInterface::telnet:
-      setInterface(OutputInterface::BOTH);
-      break;
-    case OutputInterface::BOTH:
-      setInterface(OutputInterface::serial);
-      break;
-  }
-}
 
-OutputInterface ESP32_CLI::getCurrentInterface() {
-  return _interface;
-}
+// OutputInterface ESP32_CLI::getCurrentInterface() {
+//   return _interface;
+// }
 
 void ESP32_CLI::print(const String& text) {
   if (_interface == OutputInterface::serial || _interface == OutputInterface::BOTH) {
@@ -117,14 +112,14 @@ void ESP32_CLI::update() {
         _inputBuffer.remove(_inputBuffer.length() - 1);
         // Echo backspace
         if (_interface == OutputInterface::telnet || _interface == OutputInterface::BOTH) {
-          TelnetStream.print("\b \b");
+        //   TelnetStream.print("\b \b");
         }
       }
     } else {
       _inputBuffer += c;
       // Echo character
       if (_interface == OutputInterface::telnet || _interface == OutputInterface::BOTH) {
-        TelnetStream.print(c);
+        // TelnetStream.print(c);
       }
     }
   }
@@ -225,6 +220,7 @@ std::vector<String> ESP32_CLI::splitString(const String& input, char delimiter) 
 }
 
 bool ESP32_CLI::isClientConnected() {
+    return true;
 //   return !TelnetStream.disconnected();
 
 

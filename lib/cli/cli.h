@@ -21,16 +21,17 @@ public:
   String command;
   String description;
   std::function<void(const std::vector<String>&)> callback;
-};
+}; 
 
 class ESP32_CLI {
 public:
   ESP32_CLI();
   
   void begin(unsigned long baudRate = 115200);
-  void setInterface(OutputInterface interface);
-  void switchInterface();
-  OutputInterface getCurrentInterface();
+
+
+  inline void setInterface(OutputInterface interface){_interface = interface;};
+  inline OutputInterface getCurrentInterface(){return _interface;};
   
   void print(const String& text);
   void println(const String& text);

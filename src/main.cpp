@@ -3,19 +3,28 @@
 #include <TimeLib.h>
 #include <TelnetStream.h>
 #include "cli.h"
+#include "cli_command.h"
 
-const long gmtOffset_sec = 3600;
+//TODO
+/**
+ * TODO add CLI command
+ * Add Circular buffer to handle uart command
+ * How Telnet work
+ * 
+ */
+const long gmtOffset_sec = 25200;//3600 * Time
 const int daylightOffset_sec = 3600;
 
 // WiFi credentials
-const char ssid[] = "Phuc Phuc";
-const char pass[] = "phuc05042002";
+const char ssid[] = "WIFI_SSID";
+const char pass[] = "WIFI_PASS";
+
+
 
 // Function prototypes
 void setupWiFi();
 void setupTime();
 void logSensorData();
-void showStatus();
 void restartESP();
 
 void setup() {
@@ -23,34 +32,44 @@ void setup() {
   CLI.begin(115200);
   CLI.println("ESP32 CLI Demo");
   
+  // Initialize CommandManager
+  // debug message
+  // CLI.println("Initializing CommandManager...");
+
+  
+
+  
+  // Commands.registerCommand(CommandAdvanced(
+  //   "read",
+  //   "Read sensor data",
+  //   [](const std::vector<String>& args) {
+  //     if (args.size() > 1 && args[1].equalsIgnoreCase("adc")) {
+  //       int value = analogRead(A0);
+  //       CLI.print("ADC value: ");
+  //       CLI.println(String(value));
+  //     } else {
+  //       CLI.println("Usage: read adc");
+  //     }
+  //   },
+  //   "read adc",
+  //   CommandGroup::PERIPHERALS,
+  //   2, 2
+  // ));
+  
   // Setup network
+  //debug message 
+  // CLI.println("Setting up WiFi...");
   setupWiFi();
+
+  //debug message
+  // CLI.println("Setting up time...");
   setupTime();
   
   // Initialize telnet
+  Commands.begin();
   TelnetStream.begin();
   
-  // Add custom commands
-  CLI.addCommand("status", "Show system status", [](const std::vector<String>& args) {
-    showStatus();
-  });
-  
-  CLI.addCommand("restart", "Restart the ESP32", [](const std::vector<String>& args) {
-    restartESP();
-  });
-  
-  CLI.addCommand("read", "Read sensor (usage: read adc)", [](const std::vector<String>& args) {
-    if (args.size() > 1 && args[1].equalsIgnoreCase("adc")) {
-      int value = analogRead(A0);
-      CLI.print("ADC value: ");
-      CLI.println(String(value));
-    } else {
-      CLI.println("Usage: read adc");
-    }
-  });
-  
-  CLI.println("Type 'help' for available commands");
-  CLI.print("> ");
+
 }
 
 void loop() {
@@ -112,54 +131,7 @@ void logSensorData() {
   }
 }
 
-void showStatus() {
-  CLI.println("--- System Status ---");
-  
-  // WiFi status
-  CLI.print("WiFi: ");
-  CLI.print(WiFi.status() == WL_CONNECTED ? "Connected to " : "Disconnected");
-  if (WiFi.status() == WL_CONNECTED) {
-    CLI.println(ssid);
-    CLI.print("IP: ");
-    CLI.println(WiFi.localIP().toString());
-    CLI.print("Signal: ");
-    CLI.print(String(WiFi.RSSI()));
-    CLI.println(" dBm");
-  } else {
-    CLI.println("");
-  }
-  
-  // Time
-  char timeStr[20];
-  sprintf(timeStr, "%02d-%02d-%02d %02d:%02d:%02d", 
-          year(), month(), day(), hour(), minute(), second());
-  CLI.print("Current time: ");
-  CLI.println(timeStr);
-  
-  // Memory
-  CLI.print("Free heap: ");
-  CLI.print(String(ESP.getFreeHeap()));
-  CLI.println(" bytes");
-  
-  // Telnet status
-  //TODO: check if TelnetStream is connected
-  // CLI.print("Telnet client: ");
-  // CLI.println(CLI.isClientConnected() ? "Connected" : "Not connected");
-  
-  // Current interface
-  CLI.print("Current interface: ");
-  switch (CLI.getCurrentInterface()) {
-    case OutputInterface::serial:
-      CLI.println("SERIAL");
-      break;
-    case OutputInterface::telnet:
-      CLI.println("TELNET");
-      break;
-    case OutputInterface::BOTH:
-      CLI.println("BOTH");
-      break;
-  }
-}
+
 
 void restartESP() {
   CLI.println("Restarting ESP32...");
